@@ -18,7 +18,6 @@ def ag_water():
 
 # @st.experimental_singleton
 def init_connection():
-    # return psycopg2.connect(**st.secrets["postgres"])
 	con = ag_water()
 	st.session_state['con'] = con
 	inspector = inspect(con)
