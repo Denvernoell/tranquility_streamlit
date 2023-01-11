@@ -3,3 +3,4 @@ plotly
 geopandas
 leafmap
 sqlalchemy
+psycopg2
