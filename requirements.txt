@@ -5,3 +5,4 @@ leafmap
 # sqlalchemy
 supabase
 arrow
+openpyxl

@@ -59,7 +59,7 @@ class Well:
 		name = well_aliases['Alias - Extractions']
 		if name is not None:
 			# extractions = st.session_state['dfs']['TID_extractions_monthly_AF']
-			extractions = get_table('TID_extractions_monthly_AF')
+			extractions = get_table('TID_extractions_monthly_AF').sort_values(['date'])
 			# ! Check if Extractions.1 affects this
 			well_extractions = extractions.loc[extractions['well_id'] == name]
 			st.plotly_chart(
@@ -71,7 +71,7 @@ class Well:
 		name = well_aliases['Alias - Depth to water']
 		if name is not None:
 			# depth_to_water = st.session_state['dfs']['TID_well_depth_to_water_ft']
-			depth_to_water = get_table('TID_well_depth_to_water_ft')
+			depth_to_water = get_table('TID_well_depth_to_water_ft').sort_values(['date'])
 			st.dataframe(depth_to_water)
 
 			well_depth_to_water = depth_to_water.loc[depth_to_water['well_id'] == name]

@@ -27,7 +27,8 @@ def get_table(table_name):
 st.title('Tranquility Depth to water')
 if st.session_state['Logged In']:
 	table_name = 'TID_well_depth_to_water_ft'
-	df = get_table(table_name)
+	df = get_table(table_name).sort_values(['date'])
+	# st.dataframe(df)
 	# df = st.session_state.dfs[table_name]
 	wells = [i for i in df['well_id'].unique()]
 	wells_to_use = st.multiselect("Wells",wells,default=wells)
