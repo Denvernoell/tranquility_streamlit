@@ -21,11 +21,13 @@ def export_df(df,file_name):
 	# return linko
 	st.markdown(linko, unsafe_allow_html=True)
 	
+def get_table(table_name):
+	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
 
-
-st.title('Tranquility Wells')
+st.title('Tranquillity Wells')
 if st.session_state['Logged In']:
-	df = st.session_state.dfs['TID_extractions_monthly_AF']
+	df = get_table('TID_extractions_monthly_AF')
+	# df = st.session_state.dfs['TID_extractions_monthly_AF']
 	wells = [i for i in df['well_id'].unique()]
 	wells_to_use = st.multiselect("Wells",wells,default=wells)
 	if wells_to_use:

@@ -23,7 +23,8 @@ def export_df(df,file_name,index=True,header=True):
 	# return linko
 	st.markdown(linko, unsafe_allow_html=True)
 
-
+def get_table(table_name):
+	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
 
 
 import leafmap.foliumap as leafmap
@@ -37,34 +38,47 @@ st.title('Tranquillity Wells')
 
 # class Well that makes graphs and maps if the data is available
 class Well:
-	def __init__(self,well_aliases):
+	def __init__(self,well_info):
+		# this only grabs the top row of the well_info dataframe (look into Well No.21 and City Well #7)
+		well_aliases = well_info.iloc[0]
 		self.well_aliases = well_aliases
+
 		# st.markdown(well_aliases['Alias - Locations'] is np.nan)
-	
-		if well_aliases['Alias - Locations'] is not np.nan:
-			locations = st.session_state['dfs']['TID_well_locations']
-			well_location = locations.loc[locations['well_id'] == well_aliases['Alias - Locations']]
+		# st.markdown(f"Location = {well_aliases['Alias - Locations']})
+		# st.markdown(f"DTW = "+  well_aliases['Alias - Depth to water'])
+		# st.markdown(f"Extractions = " + well_aliases['Alias - Extractions'])
+
+		name = well_aliases['Alias - Locations']
+		if name is not None:
+			# locations = st.session_state['dfs']['TID_well_locations']
+			locations = get_table('TID_well_locations')
+			well_location = locations.loc[locations['well_id'] == name]
 			st.dataframe(well_location)
 			self.well_map(well_location)
 		
-		if well_aliases['Alias - Extractions'] is not np.nan:
-			extractions = st.session_state['dfs']['TID_extractions_monthly_AF']
-			
+		name = well_aliases['Alias - Extractions']
+		if name is not None:
+			# extractions = st.session_state['dfs']['TID_extractions_monthly_AF']
+			extractions = get_table('TID_extractions_monthly_AF')
 			# ! Check if Extractions.1 affects this
-			well_extractions = extractions.loc[extractions['well_id'] == well_aliases['Alias - Extractions']]
+			well_extractions = extractions.loc[extractions['well_id'] == name]
 			st.plotly_chart(
 				self.well_extractions_figure(well_extractions)
 			)
 			st.dataframe(well_extractions)
 			export_df(well_extractions,'well_extractions.xlsx',index=False)
 		
-		if well_aliases['Alias - Depth to water'] is not np.nan:
-			depth_to_water = st.session_state['dfs']['TID_well_depth_to_water_ft']
-			well_depth_to_water = depth_to_water.loc[depth_to_water['well_id'] == well_aliases['Alias - Depth to water']]
-			st.plotly_chart(
-				self.create_dtw_figure(well_depth_to_water)
-			)
-			st.dataframe(well_depth_to_water )
+		name = well_aliases['Alias - Depth to water']
+		if name is not None:
+			# depth_to_water = st.session_state['dfs']['TID_well_depth_to_water_ft']
+			depth_to_water = get_table('TID_well_depth_to_water_ft')
+			st.dataframe(depth_to_water)
+
+			well_depth_to_water = depth_to_water.loc[depth_to_water['well_id'] == name]
+			# st.markdown(name)
+			st.plotly_chart(self.create_dtw_figure(well_depth_to_water))
+
+			st.dataframe(well_depth_to_water)
 			export_df(well_depth_to_water,'well_depth_to_water.xlsx',index=False)
 	
 	def create_dtw_figure(self,df):
@@ -193,16 +207,24 @@ class Well:
 		# https://leafmap.org/notebooks/11_linked_maps/#change-basemaps
 		# M.add_marker()
 		# file_path = r'\\ppeng.com\pzdata\clients\Tranquillity ID-1075\GIS\Feature\TID.shp'
-		file_path = r'data\TID.shp'
+		# file_path = r'data\TID.shp'
 
-		boundary = gpd.read_file(
-			file_path,
-			crs="EPSG:4326"
-			)
-		# ! figure out why this doesnt work
+		# boundary = gpd.read_file(
+		# 	file_path,
+		# 	crs="EPSG:4326"
+		# 	)
+		# # ! figure out why this doesnt work
+		boundaries = get_table('TID_gis_boundaries')
+		boundaries_df = boundaries.loc[boundaries['file_name'].isin(['Tranquillity Irrigation District',"Fresno Slough Water District"])]
+		from shapely import wkb,wkt
+		boundaries_gdf = gpd.GeoDataFrame(boundaries_df,geometry=boundaries_df['geometry'].apply(wkt.loads),crs="EPSG:4326")
+		
+		M.add_gdf(boundaries_gdf,layer_name="Boundaries",info_mode='on_click')
+
+
 		# M.add_gdf(
 		# 	boundary,
-		# 	layer_name="Tranquillity Boundary",
+		# 	layer_name="Boundaries",
 		# 	info_mode=None,
 		# 	)
 
@@ -229,7 +251,8 @@ class Well:
 if st.session_state['Logged In']:
 	st.markdown('Logged in')
 
-	name_df = st.session_state['dfs']['TID_well_names']
+	# name_df = st.session_state['dfs']['TID_well_names']
+	name_df = get_table('TID_well_names')
 	if st.checkbox("Show well names"):
 		st.dataframe(name_df.pipe(format_df))
 
@@ -253,8 +276,8 @@ if st.session_state['Logged In']:
 
 	well_info = name_df.loc[name_df.isin([wells_to_use]).any(axis='columns')]
 	st.dataframe(well_info)
-	well_aliases = well_info.iloc[0]
-	W = Well(well_aliases)
+
+	W = Well(well_info)
 	# W
 	# if points_to_use:
 	# 	plot_positions(positions,points_to_use)

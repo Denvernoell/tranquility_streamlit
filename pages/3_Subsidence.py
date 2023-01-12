@@ -37,8 +37,10 @@ def to_decimal_degrees(coord):
 import leafmap.foliumap as leafmap
 # import leafmap.leafmap as leafmap  # for ipyleaflet only
 
+def get_table(table_name):
+	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
 
-st.title('Tranquility Subsidence')
+st.title('Tranquillity Subsidence')
 table_name = 'TID_subsidence_points'
 if st.session_state['Logged In']:
 	def plot_positions(df,points_to_use):
@@ -78,14 +80,20 @@ if st.session_state['Logged In']:
 		# M.add_marker()
 		# file_path = r'\\ppeng.com\pzdata\clients\Tranquillity ID-1075\GIS\Feature\TID.shp'
 		
-		file_path = r'data\TID.shp'
-		boundary = gpd.read_file(
-			file_path,
-			# epsg="EPSG:4326",
-			epsg='4326',
-			)#.to_crs("EPSG:4326")
-			# ! figure out why this doesnt work
-		# M.add_gdf(boundary,layer_name="Tranquility Boundary",info_mode=None)
+		# file_path = r'data\TID.shp'
+		# boundary = gpd.read_file(
+		# 	file_path,
+		# 	# epsg="EPSG:4326",
+		# 	epsg='4326',
+		# 	)#.to_crs("EPSG:4326")
+		# 	# ! figure out why this doesnt work
+		
+		boundaries = get_table('TID_gis_boundaries')
+		boundaries_df = boundaries.loc[boundaries['file_name'].isin(['Tranquillity Irrigation District',"Fresno Slough Water District"])]
+		from shapely import wkb,wkt
+		boundaries_gdf = gpd.GeoDataFrame(boundaries_df,geometry=boundaries_df['geometry'].apply(wkt.loads),crs="EPSG:4326")
+		
+		M.add_gdf(boundaries_gdf,layer_name="Boundaries",info_mode='on_click')
 
 		M.to_streamlit()
 
@@ -97,12 +105,14 @@ if st.session_state['Logged In']:
 		# st.dataframe(pivot)
 		return points_to_use
 
-	positions = st.session_state.dfs['TID_subsidence_points']
+	# positions = st.session_state.dfs['TID_subsidence_points']
+	positions = get_table('TID_subsidence_points')
 	points = [i for i in positions['point_id'].unique()]
 	points_to_use = st.multiselect("Points",points,default=points)
 	if points_to_use:
 		plot_positions(positions,points_to_use)
-		elevations = st.session_state.dfs['TID_subsidence_elevations']
+		# elevations = st.session_state.dfs['TID_subsidence_elevations']
+		elevations = get_table('TID_subsidence_elevations')
 		gse(elevations,points_to_use)
 
 else:
