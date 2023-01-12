@@ -4,3 +4,4 @@ geopandas
 leafmap
 # sqlalchemy
 supabase
+arrow
