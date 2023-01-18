@@ -13,17 +13,17 @@ import io
 import arrow
 
 import geopandas as gpd
+
+
+from dashboard_shared import Table,Components,export_df
+
+C = Components("Tranquillity")
+C.header()
+
+
 get_date = lambda year,month: arrow.get(f"{year}-{month}","YYYY-M").format("MMMM YYYY")
 add_date = lambda df: df.assign(date = [get_date(y['year'],y['month']) for i,y in df.iterrows()])
 
-def export_df(df,file_name):
-	towrite = io.BytesIO()
-	downloaded_file = df.to_excel(towrite, encoding='utf-8', index=True, header=True)
-	towrite.seek(0)  # reset pointer
-	b64 = base64.b64encode(towrite.read()).decode()  # some strings
-	linko= f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="{file_name}">Download excel file</a>'
-	# return linko
-	st.markdown(linko, unsafe_allow_html=True)
 	
 def to_decimal_degrees(coord):
 	C = coord.split(' ')
@@ -40,7 +40,7 @@ import leafmap.foliumap as leafmap
 def get_table(table_name):
 	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
 
-st.title('Tranquillity Subsidence')
+st.title('Subsidence')
 table_name = 'TID_subsidence_points'
 if st.session_state['Logged In']:
 	def plot_positions(df,points_to_use):

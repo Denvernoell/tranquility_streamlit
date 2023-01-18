@@ -11,20 +11,16 @@ import webbrowser
 
 import arrow
 
-def export_df(df,file_name):
-	towrite = io.BytesIO()
-	# downloaded_file = df.to_excel(towrite, encoding='utf-8', index=False, header=True)
-	downloaded_file = df.to_excel(towrite, encoding='utf-8', index=True, header=True)
-	towrite.seek(0)  # reset pointer
-	b64 = base64.b64encode(towrite.read()).decode()  # some strings
-	linko= f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="{file_name}">Download excel file</a>'
-	# return linko
-	st.markdown(linko, unsafe_allow_html=True)
+from dashboard_shared import Table,Components,export_df
+
+C = Components("Tranquillity")
+C.header()
+
 	
 def get_table(table_name):
 	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
 
-st.title('Tranquillity Wells')
+st.title('Well Extractions')
 if st.session_state['Logged In']:
 	df = get_table('TID_extractions_monthly_AF')
 	# df = st.session_state.dfs['TID_extractions_monthly_AF']
@@ -59,3 +55,4 @@ if st.session_state['Logged In']:
 else:
 	st.markdown('Not logged in')
 
+C.footer()

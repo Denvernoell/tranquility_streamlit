@@ -11,17 +11,18 @@ import io
 import arrow
 
 import geopandas as gpd
+
+
+from dashboard_shared import Table,Components,export_df
+
+C = Components("Tranquillity")
+C.header()
+
+
 get_date = lambda year,month: arrow.get(f"{year}-{month}","YYYY-M").format("MMMM YYYY")
 add_date = lambda df: df.assign(date = [get_date(y['year'],y['month']) for i,y in df.iterrows()])
 
-def export_df(df,file_name,index=True,header=True):
-	towrite = io.BytesIO()
-	downloaded_file = df.to_excel(towrite, encoding='utf-8', index=index, header=header)
-	towrite.seek(0)  # reset pointer
-	b64 = base64.b64encode(towrite.read()).decode()  # some strings
-	linko= f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="{file_name}">Download excel file</a>'
-	# return linko
-	st.markdown(linko, unsafe_allow_html=True)
+
 
 def get_table(table_name):
 	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
@@ -33,7 +34,7 @@ import leafmap.foliumap as leafmap
 # format_df = lambda df:df.style.applymap(lambda x: 'color: transparent' if pd.isnull(x) else '').format(formatter="{:.2f}")
 format_df = lambda df:df.style.applymap(lambda x: 'color: transparent' if pd.isnull(x) else '')
 
-st.title('Tranquillity Wells')
+st.title('Well Locations, Extractions, and Water Levels')
 
 
 # class Well that makes graphs and maps if the data is available
@@ -214,6 +215,7 @@ class Well:
 		# 	crs="EPSG:4326"
 		# 	)
 		# # ! figure out why this doesnt work
+
 		boundaries = get_table('TID_gis_boundaries')
 		boundaries_df = boundaries.loc[boundaries['file_name'].isin(['Tranquillity Irrigation District',"Fresno Slough Water District"])]
 		from shapely import wkb,wkt
@@ -230,21 +232,7 @@ class Well:
 
 		M.to_streamlit()
 
-	# def show_pdf(file_path):
-	# 	with open(file_path,"rb") as f:
-	# 		base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-	# 		pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="800" height="800" type="application/pdf"></iframe>'		
-	# 		st.markdown(pdf_display, unsafe_allow_html=True)
 
-	# def download_pdf(file_path):
-			
-	# 	with open(file_path, "rb") as pdf_file:
-	# 		PDFbyte = pdf_file.read()
-
-	# 	st.download_button(label="Download PDF Tutorial", 
-	# 			data=PDFbyte,
-	# 			file_name="pandas-clean-id-column.pdf",
-	# 			mime='application/octet-stream')
 
 
 
@@ -291,3 +279,4 @@ else:
 
 
 
+C.footer()
