@@ -1,33 +1,11 @@
 import streamlit as st
-st.title('Tranquillity Data Platform')
 import pandas as pd
 import supabase
 
-# from sqlalchemy import create_engine,inspect
-# def connect_to_postgres(username,password,host,database):
-# 	engine = create_engine(f"postgresql://{username}:{password}@{host}:5432/{database}")  
-# 	return engine
+from dashboard_shared import Table,Components
 
-# def ag_water():
-# 	engine = connect_to_postgres(	
-# 		username='postgres',
-# 		password=st.secrets['password'],
-# 		host=st.secrets['host'],
-# 		database='postgres',
-# 	)
-# 	return engine
-
-# # @st.experimental_singleton
-# def init_connection():
-# 	con = ag_water()
-# 	st.session_state['con'] = con
-# 	inspector = inspect(con)
-# 	table_names = [i for i in inspector.get_table_names() if i.find('TID_') != -1]
-# 	dfs = {name:pd.read_sql_table(f"{name}",con).drop(columns=["index"]) for name in table_names}
-# 	table_names = [i for i in dfs.keys()]
-# 	st.session_state['dfs'] = dfs
-# 	return con
-
+C = Components("Tranquillity")
+C.header()
 
 
 def login_page():
@@ -41,13 +19,6 @@ def login_page():
 			st.success('Logged in')
 			st.session_state['Logged In'] = True
 			st.session_state['client'] = supabase.create_client(st.secrets['supabase_url'],st.secrets['supabase_key'])
-			# init_connection()
-
-			# using Excel
-			# file_path = r"\\ppeng.com\pzdata\clients\Tranquillity ID-1075\Ongoing-1075\2000-Data Management System\data\cleaned_data_for_database.xlsx"
-			# dfs = pd.read_excel(file_path,sheet_name=None)
-			# st.session_state['dfs'] = dfs
-			# st.markdown("Logged in")
 
 try:
 	if st.session_state['Logged In']:
@@ -57,3 +28,5 @@ try:
 except:
 	st.session_state['Logged In'] = False
 	login_page()
+
+C.footer()
