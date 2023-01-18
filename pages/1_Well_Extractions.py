@@ -16,11 +16,11 @@ from dashboard_shared import Table,Components,export_df
 C = Components("Tranquillity")
 C.header()
 
+st.subheader('Well Extractions')
 	
 def get_table(table_name):
 	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
 
-st.title('Well Extractions')
 if st.session_state['Logged In']:
 	df = get_table('TID_extractions_monthly_AF')
 	# df = st.session_state.dfs['TID_extractions_monthly_AF']

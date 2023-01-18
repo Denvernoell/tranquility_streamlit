@@ -18,6 +18,7 @@ from dashboard_shared import Table,Components,export_df
 C = Components("Tranquillity")
 C.header()
 
+st.subheader('Well Locations, Extractions, and Water Levels')
 
 get_date = lambda year,month: arrow.get(f"{year}-{month}","YYYY-M").format("MMMM YYYY")
 add_date = lambda df: df.assign(date = [get_date(y['year'],y['month']) for i,y in df.iterrows()])
@@ -34,7 +35,6 @@ import leafmap.foliumap as leafmap
 # format_df = lambda df:df.style.applymap(lambda x: 'color: transparent' if pd.isnull(x) else '').format(formatter="{:.2f}")
 format_df = lambda df:df.style.applymap(lambda x: 'color: transparent' if pd.isnull(x) else '')
 
-st.title('Well Locations, Extractions, and Water Levels')
 
 
 # class Well that makes graphs and maps if the data is available

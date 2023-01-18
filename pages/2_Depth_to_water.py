@@ -16,6 +16,7 @@ from dashboard_shared import Table,Components,export_df
 C = Components("Tranquillity")
 C.header()
 
+st.subheader('Depth to water')
 
 get_date = lambda year,month: arrow.get(f"{year}-{month}","YYYY-M").format("MMMM YYYY")
 add_date = lambda df: df.assign(date = [get_date(y['year'],y['month']) for i,y in df.iterrows()])
@@ -24,7 +25,6 @@ add_date = lambda df: df.assign(date = [get_date(y['year'],y['month']) for i,y i
 def get_table(table_name):
 	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
 
-st.title('Depth to water')
 if st.session_state['Logged In']:
 	table_name = 'TID_well_depth_to_water_ft'
 	df = get_table(table_name).sort_values(['date'])

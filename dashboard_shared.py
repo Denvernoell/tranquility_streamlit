@@ -14,6 +14,7 @@ import arrow
 class Components:
 	def __init__(self,name):
 		self.name = name
+		st.set_page_config(page_title=f"{self.name} Data Management System",page_icon=":bar_chart:")
 	def header(self):
 		st.title(f"{self.name} Data Management System")
 	def footer(self):

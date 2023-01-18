@@ -20,6 +20,7 @@ from dashboard_shared import Table,Components,export_df
 C = Components("Tranquillity")
 C.header()
 
+st.subheader('Subsidence')
 
 get_date = lambda year,month: arrow.get(f"{year}-{month}","YYYY-M").format("MMMM YYYY")
 add_date = lambda df: df.assign(date = [get_date(y['year'],y['month']) for i,y in df.iterrows()])
@@ -40,7 +41,6 @@ import leafmap.foliumap as leafmap
 def get_table(table_name):
 	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
 
-st.title('Subsidence')
 table_name = 'TID_subsidence_points'
 if st.session_state['Logged In']:
 	def plot_positions(df,points_to_use):
