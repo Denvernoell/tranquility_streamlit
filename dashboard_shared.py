@@ -14,11 +14,15 @@ import arrow
 class Components:
 	def __init__(self,name):
 		self.name = name
-		st.set_page_config(page_title=f"{self.name} Data Management System",page_icon=":bar_chart:")
+		st.set_page_config(
+			page_title=f"{self.name} Data Management System",
+			page_icon="📊",
+			layout="wide",
+			)
 	def header(self):
 		st.title(f"{self.name} Data Management System")
 	def footer(self):
-		st.markdown(f"Provost & Pritchard Consulting Group - 2023")
+		st.markdown(f"*Provost & Pritchard Consulting Group - 2023*")
 
 
 def export_df(df,file_name,index=True,header=True):
