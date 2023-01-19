@@ -2,9 +2,8 @@ import streamlit as st
 import pandas as pd
 import supabase
 
-# from dashboard_shared import Table,Components
-from streamlit_data_management.dashboard import Table,Components
-
+from dashboard_shared import Table,Components
+# from streamlit_data_management.dashboard import Table,Components
 
 C = Components("Tranquillity")
 C.header()
