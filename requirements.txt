@@ -6,3 +6,4 @@ leafmap
 supabase
 arrow
 openpyxl
+streamlit_data_management
