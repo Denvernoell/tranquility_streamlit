@@ -1,13 +1,11 @@
 import streamlit as st
 import sys
-# sys.path.append('..')
-# from plotly_figures import create_extractions_figure
+
 import plotly.graph_objects as go
 import pandas as pd
 
 import base64
 import io
-import webbrowser
 
 import arrow
 
@@ -22,7 +20,17 @@ class Components:
 	def header(self):
 		st.title(f"{self.name} Data Management System")
 	def footer(self):
-		st.markdown(f"*Provost & Pritchard Consulting Group - 2023*")
+		st.write("---")
+		st.markdown(f"[*Provost & Pritchard Consulting Group - 2023*](https://provostandpritchard.com/)")
+
+	def month_picker(self,start_year,end_year):
+		if st.checkbox("Single Month"):
+			month = st.selectbox('Month',[arrow.get(i,"M").format('MMMM') for i in range(1,13)])
+			year = st.selectbox('Year',range(start_year,end_year))
+			return arrow.get(f"{year}-{month}","YYYY-M")
+
+
+
 
 
 def export_df(df,file_name,index=True,header=True):
@@ -41,14 +49,15 @@ def show_pdf(file_path):
 		pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="800" height="800" type="application/pdf"></iframe>'		
 		st.markdown(pdf_display, unsafe_allow_html=True)
 
-def download_pdf(file_path):
+
+def download_pdf(file_path,file_name,label):
 		
 	with open(file_path, "rb") as pdf_file:
 		PDFbyte = pdf_file.read()
 
-	st.download_button(label="Download PDF Tutorial", 
+	st.download_button(label=label, 
 			data=PDFbyte,
-			file_name="pandas-clean-id-column.pdf",
+			file_name=f"{file_name}.pdf",
 			mime='application/octet-stream')
 
 
@@ -57,12 +66,15 @@ def convert_date(df,col):
 	return df
 
 class Table:
-	def __init__(self,client,table_name):
+	# def __init__(self,client,table_name):
+	def __init__(self,table_name):
 		"""
 		client: supabase connection
 		table_name: table name of supabase table
 		"""
-		self.client = client
+		# self.client = client
+		self.client = st.session_state['client']
+		
 		self.table_name = table_name
 		self.refresh()
 	

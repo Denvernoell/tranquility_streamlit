@@ -22,7 +22,11 @@ def get_table(table_name):
 	return pd.DataFrame(st.session_state['client'].table(table_name).select('*').execute().data)
 
 if st.session_state['Logged In']:
-	df = get_table('TID_extractions_monthly_AF')
+	table_name = 'TID_extractions_monthly_AF'
+	# df = get_table(table_name)
+	df = Table(table_name).df
+
+
 	# df = st.session_state.dfs['TID_extractions_monthly_AF']
 	wells = [i for i in df['well_id'].unique()]
 	wells_to_use = st.multiselect("Wells",wells,default=wells)
